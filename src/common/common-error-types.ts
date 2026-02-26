@@ -1,0 +1,21 @@
+export enum CommonErrorType {
+  INVALID_FIREBASE_TOKEN = 10000,
+  REDIS_ERROR = 10002,
+  INVALID_JWT = 10003,
+  INVALID_USER_ID = 10004,
+  MANAGER_ONLEY = 10005,
+  CLIENT_ONLEY = 10006,
+  TRANSACTION_ERROR = 10007,
+  API_ERROR = 10008,
+  FCM_ERROR = 10009,
+}
+
+export enum YouTubeErrorType {
+  INVALID_URL = 20000,
+  TOO_LOGNG = 20001,
+}
+
+export enum UserErrorType {
+  BAND_EXIST = 30000,
+  USER_NO_EXIST = 30001,
+}

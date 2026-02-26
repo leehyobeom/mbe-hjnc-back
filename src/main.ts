@@ -1,13 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: 'http://localhost:4000', // Nuxt 주소
-    credentials: true,
-  });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.useStaticAssets(
+    join(process.cwd(), 'dbFiles'),
+    { prefix: '/dbFiles/' },
+  );
   await app.listen(3000);
 }
 bootstrap();
