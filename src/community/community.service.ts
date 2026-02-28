@@ -24,6 +24,7 @@ import { Community, CommunityDocument } from './models/community.schema';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class CommunityService {
@@ -413,5 +414,72 @@ export class CommunityService {
         `readCommunityList error: ${error.message}`,
       );
     }
+  }
+
+  async deleteOldCommunities(): Promise<{ deletedCount: number }> {
+    try {
+      // 1️⃣ 1년 기준 날짜 계산
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+      // 2️⃣ 삭제 대상 조회
+      const oldCommunities = await this.communityModel
+        .find({
+          updatedAt: { $lt: oneYearAgo },
+        })
+        .lean();
+
+      if (oldCommunities.length === 0) {
+        return { deletedCount: 0 };
+      }
+
+      // 3️⃣ 이미지 폴더 삭제
+      for (const community of oldCommunities) {
+        const folderPath = path.join(
+          process.cwd(),
+          'dbFiles',
+          community._id.toString(),
+        );
+
+        if (fs.existsSync(folderPath)) {
+          try {
+            await fs.promises.rm(folderPath, {
+              recursive: true,
+              force: true,
+            });
+          } catch (fileError) {
+            console.error(
+              `폴더 삭제 실패 (${community._id}):`,
+              fileError,
+            );
+          }
+        }
+      }
+
+      // 4️⃣ DB 문서 일괄 삭제
+      const deleteResult = await this.communityModel.deleteMany({
+        updatedAt: { $lt: oneYearAgo },
+      });
+
+      return { deletedCount: deleteResult.deletedCount ?? 0 };
+
+    } catch (error) {
+      throw new HandleException(
+        CommonErrorType.TRANSACTION_ERROR,
+        `deleteOldCommunities error: ${error.message}`,
+      );
+    }
+
+
+  }
+
+
+  @Cron('0 0 3 * * *', {
+    timeZone: 'Asia/Seoul',
+  })
+  async handleDeleteOldCommunities() {
+    console.log('🕒 1년 지난 커뮤니티 삭제 시작');
+    const result = await this.deleteOldCommunities();
+    console.log(`✅ ${result.deletedCount}개 삭제 완료`);
   }
 }
