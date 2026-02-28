@@ -21,6 +21,8 @@ import {
   RequestReadListCommunityDto,
   RequestUpdateCommunityDto,
   ResponseUpdateCommunityDto,
+  ResponseDeleteCommunityDto,
+  RequestDeleteCommunityDto,
 } from './models/community.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 @Controller('community')
@@ -83,6 +85,22 @@ export class CommunityController {
     @Body() dto: RequestReadCommunityDto,
   ) {
     const result = await this.communityService.readCommunity(dto);
+    return ResponseFactory.fromResult(result);
+  }
+
+  @Put('/delete')
+  @ApiOperation({
+    summary: '게시글 정보',
+    description: `게시글 정보를 불러온다.
+    \n\n- 언제: 게시글 목록 중 클릭시
+    \n\n- 누가: 모든 유저
+    \n\n- 목적: 게시글 정보를 보기 위해`,
+  })
+  @ResponseFactory.ResponseDecoration(ResponseDeleteCommunityDto)
+  async deleteCommunity(
+    @Body() dto: RequestDeleteCommunityDto,
+  ) {
+    const result = await this.communityService.deleteCommunity(dto);
     return ResponseFactory.fromResult(result);
   }
 

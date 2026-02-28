@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { IsBooleanString } from 'class-validator';
 import { Types } from 'mongoose';
 export class CommunityDto {
   @ApiProperty({ description: '게시글 ID' })
@@ -33,7 +34,7 @@ export class CommunityDto {
     if (!document) {
       return;
     }
-    this.communityId = document.communityId;
+    this.communityId = document._id;
     this.title = document.title;
     this.text = document.text;
     this.images = document.images;
@@ -85,18 +86,25 @@ export class RequestUpdateCommunityDto {
   @ApiProperty({ description: '베이 번호' })
   bay: string;
 
-  @Type(() => Boolean)
-  isHold: boolean;
+  isHold: string;
 
-  @Type(() => Boolean)
-  isLD: boolean;
+  isLD: string;
 
-  @ApiProperty({ description: '삭제할 s3 url' })
-  deletedImages: string[];
+  @ApiProperty({ description: '삭제할 image path' })
+  deletedImages: string
 
-  @ApiProperty({ description: '수정할 s3 url' })
-  changedImages: string[];
+  @ApiProperty({ description: '수정할 image path' })
+  changedImages: string;
 }
+
+export class ChangedImageUrlDto {
+  @ApiProperty({ description: '변경할 인덱스' })
+  index: number;
+
+  @ApiProperty({ description: '변경 대상 url' })
+  url: string;
+}
+
 export class ResponseUpdateCommunityDto extends CommunityDto { }
 
 export class RequestReadCommunityDto {
@@ -117,3 +125,9 @@ export class ResponseReadListCommunityDto {
   @ApiProperty({ description: '게시글 목록' })
   communities: CommunityDto[] = [];
 }
+
+export class RequestDeleteCommunityDto {
+  @ApiProperty({ description: '게시글 ID' })
+  communityId: string;
+}
+export class ResponseDeleteCommunityDto extends CommunityDto { }
