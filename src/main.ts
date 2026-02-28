@@ -10,6 +10,6 @@ async function bootstrap() {
     join(process.cwd(), 'dbFiles'),
     { prefix: '/dbFiles/' },
   );
-  await app.listen(9000);
+  await app.listen(9100);
 }
 bootstrap();
