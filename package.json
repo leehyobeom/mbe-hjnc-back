@@ -11,6 +11,8 @@
     "start": "nest start",
     "serve:dev": "cross-env NODE_ENV=dev APP_MODE=api nest start --watch",
     "serve:prod": "cross-env NODE_ENV=prod APP_MODE=api nest start --watch",
+    "dev": "cross-env NODE_ENV=dev APP_MODE=api node dist/main",
+    "prod": "cross-env NODE_ENV=prod APP_MODE=api node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
